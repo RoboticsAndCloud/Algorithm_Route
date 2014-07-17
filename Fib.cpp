@@ -1,5 +1,6 @@
 #include "Fib.h"
 #include <iostream>
+#include <windows.h>
 
 #define NONROUTE_PORT -1	//the default next-hop port of root node
 #define OVERLYING_PORT 66    //构建Merged trie时使用，最后merged trie的叶节点newPort取此值
@@ -112,6 +113,8 @@ void CFib::Pretraversal(TrieNode* pTrie,int depth)
 void CFib::GetNodeCounts()
 {
 	Zero(numofDepth);
+	Zero(numofMid);
+	Zero(numofYellow);
 
 	allNodeCount=0;
 	solidNodeCount=0;
@@ -508,6 +511,73 @@ void CFib::AddNode(unsigned long lPrefix,unsigned int iPrefixLen,unsigned int iN
 
 	pTrie->newPort = iNextHop;
 	pTrie->oldPort = iNextHop;
+}
+
+
+int  CFib::FindIp(unsigned int ip, unsigned int prefixLen)
+{
+	//cout << "in CFib::FindIp " << ip << endl;
+
+	TrieNode* pTrie = m_pTrie;
+	unsigned int i;
+	for (i = 0; i < prefixLen; i++)
+	{
+		
+		if (((ip << i) & HIGHTBIT) == HIGHTBIT) //HIGHTBIT =0x80000000
+		{
+			pTrie = pTrie->rchild;
+
+		}
+		else
+		{
+			pTrie = pTrie->lchild;
+		}
+
+		if (pTrie == NULL)
+		{
+			if (prefixLen ==16) //bitarray
+			{
+			//	cout << "bitarray CFib:findIp prefix =16" << endl;
+				return 1;
+
+			}
+		//	cout << "in CFib <prefixLen found pefixLen &&>16 " << endl;
+			return 0;
+		}
+
+	}
+	
+
+	if (i == prefixLen)
+	{
+		if (IsLeaf(pTrie))
+		{
+			cout << "just i==prefixLen isleaf..." << endl;
+			return 1;
+		}
+		
+	//	cout << "i==prefixLen,has no leaf node..." << endl;// this msg should not output
+	 //Sleep(10000);
+		/*
+		while (pTrie->lchild)
+		{
+			pTrie = pTrie->lchild;
+			i++;
+			if (IsLeaf(pTrie))
+			{
+				cout << "CFib find ip level: " << i << endl;
+				return 1;
+			}
+		}
+		*/
+
+		cout << "Can not find ip in MergedTrie, pls check out..." << endl;// this msg should not output
+	}
+
+
+
+
+	return 0;
 }
 
 

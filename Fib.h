@@ -37,6 +37,11 @@ public:
 
 	int numofDepth[40];		//numofDepth[i] is the number of prefix nodes in depth i
 
+	int numofYellow[40];   //num of  node whoes lchild&rchild are leaf
+	int numofMid[40];   //num of middle node
+
+
+
 	CFib(void);
 	~CFib(void);
 
@@ -92,6 +97,7 @@ public:
 	unsigned int BuildFibFromFile(string sFileName);
 
 	void AddNode(unsigned long lPrefix,unsigned int iPrefixLen,unsigned int iNextHop);
+	int FindIp(unsigned int ip,unsigned int prefixLen);
 };
 
 #endif /* FIB_H_ */
